@@ -1,23 +1,67 @@
+#pragma once
 #include"Mino.h"
-Mino::Mino(int x, int y, int r, Mino_Type type) :
+#include"GameSystem.h"
+
+Mino::Mino(int x, int y, Mino_Type type) :
 	_fallcnt(0),
-	_interval(def_interval - player._level * 2),
+	_interval(def_interval),
 	_pos(x, y),
-	_r(r),
 	_type(type),
+	_movecnt(0),
 	_shape{
 		{0,0,0,0},
 		{0,0,0,0},
 		{0,0,0,0},
 		{0,0,0,0}
-}
+	}
 {
 	this->CreateMino();
 };
-void Mino::Rotate()
+void Mino::RotateR()
 {
-	
+	//右回転
+	for (int y = 0;y < 2;++y) {
+		for (int x = 0;x < 2;++x) {
+			//番号保存
+			int tmp = this->_shape[3 - x][y];
+
+			//左下に右下を代入
+			this->_shape[3 - x][y] = this->_shape[3 - y][3 - x];
+
+			//右下に右上を代入
+			this->_shape[3 - y][3 - x] = this->_shape[x][3 - y];
+
+			//右上に左上を
+			this->_shape[x ][3 - y] = this->_shape[y][x];
+
+			this->_shape[y][x] = tmp;
+		}
+	}
 }
+
+void Mino::RotateL()
+{
+	//左回転
+	for (int y = 0;y < 2;++y) {
+		for (int x = 0;x < 2;++x) {
+			//左上保存
+			int tmp = this->_shape[y][x];
+
+			//右上を左上へ
+			this->_shape[y][x] = this->_shape[x][3 - y];
+
+			//右下を右上へ
+			this->_shape[x][3 - y] = this->_shape[3 - y][3 - x];
+
+			//左下を右下へ
+			this->_shape[3 - y][3 - x] = this->_shape[3 - x][y];
+
+			//保存していたものを左下へ
+			this->_shape[3 - x][y] = tmp;
+		}
+	}
+}
+
 void Mino::CreateMino()
 {
 	
@@ -92,10 +136,50 @@ void Mino::Draw() const
 void Mino::Update()
 {
 	++_fallcnt;
+	++_movecnt;
+	auto& field = GameSystem::GetInstance()->_field;
 	//落下処理
 	if (this->_fallcnt >= this->_interval || KeyDown.pressed()) {
 		++this->_pos.y;
 		this->_fallcnt = 0;
+		//当たっている判定
+		if (field->CheckHit(this)) {
+			//下に行かない
+			--this->_pos.y;
 
+			//フィールドに書き込み
+			field->InputMino(this);
+
+			//削除
+			GameSystem::GetInstance()->_mino.release();
+		}
+	}
+	//横への移動
+	Point pre = this->_pos;
+	if (KeyLeft.pressed() && _movecnt > 15) { --this->_pos.x; _movecnt = 0; }
+	if (KeyRight.pressed() && _movecnt > 15) { ++this->_pos.x; _movecnt = 0; }
+	if (field->CheckHit(this)) {
+		this->_pos = pre;
+	}
+
+	//回転処理
+	//開店前を保存
+	int pre2[4][4];
+	memcpy(pre2,this->_shape, sizeof(this->_shape));
+	
+	//右回転
+	if (KeyZ.down()) {
+		this->RotateR();
+	}
+
+	//左回転
+	if (KeyX.down()) {
+		this->RotateL();
+	}
+
+	//戻す
+	if (field->CheckHit(this)) {
+		memcpy(this->_shape, pre2, sizeof(this->_shape));
 	}
 }
+

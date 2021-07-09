@@ -47,7 +47,7 @@ static Player player;
 #define field_size_y 21
 
 //矩形サイズ
-#define mino_s 25
+#define mino_s 40
 
 //フィールド表示初期位置
 #define field_x 40
@@ -57,4 +57,4 @@ static Player player;
 #define mino_wh 4
 
 //落下時間初期値
-#define def_interval 24
+#define def_interval 30

@@ -1,15 +1,8 @@
 #pragma once
 #include"Common.h"
-#include"Mino.h"
-#include"Field.h"
-
 class Game : public Task_Scene::Scene
 {
-	//扱うミノ
-	shared_ptr<Mino> _mino;
 
-	//フィールド
-	Field _field;
 public:
 	//コンストラクタ
 	Game(const InitData& init_);
@@ -17,6 +10,7 @@ public:
 	void update()override;
 	//描画　const修飾
 	void draw()const override;
+
 	~Game();
 };
 

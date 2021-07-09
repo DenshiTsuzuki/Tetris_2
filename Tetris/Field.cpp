@@ -33,17 +33,17 @@ Field::~Field()
 {
 }
 
-bool Field::CheckHit(Mino& mino_)
+bool Field::CheckHit(Mino* mino_)
 {
 	for (int y = 0;y < 4;++y) {
 		for (int x = 0;x < 4;++x) {
 			//判定しない
-			if (mino_._shape[y][x] == 0) { continue; }
+			if (mino_->_shape[y][x] == 0) { continue; }
 
-			int xx = mino_._pos.x + x;
-			int yy = mino_._pos.y + y;
+			int xx = mino_->_pos.x + x;
+			int yy = mino_->_pos.y + y;
 			//範囲外チェック
-			if (xx > 0 || xx >= field_size_x 
+			if (xx < 0 || xx >= field_size_x 
 				|| yy < 0 || yy >= field_size_y) {
 				return true;
 			}
@@ -56,6 +56,22 @@ bool Field::CheckHit(Mino& mino_)
 		}
 	}
 	return false;
+}
+
+void Field::InputMino(Mino* mino_)
+{
+	for (int y = 0;y < mino_wh;++y) {
+		for (int x = 0;x < mino_wh;++x) {
+			//0は取り込まない
+			if (mino_->_shape[y][x] == 0) { continue; }
+		
+			int xx = mino_->_pos.x + x;
+			int yy = mino_->_pos.y + y;
+
+			//書き込み
+			this->_field[yy][xx] = mino_->_shape[y][x];
+		}
+	}
 }
 
 void Field::Draw() const
