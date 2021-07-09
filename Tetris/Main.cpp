@@ -4,7 +4,6 @@
 #include"End.h"
 void Main()
 {
-
 	//シーン遷移管理
 	Task_Scene task_scene;
 	task_scene

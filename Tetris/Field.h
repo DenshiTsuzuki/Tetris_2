@@ -1,4 +1,5 @@
 #pragma once
+#include"Mino.h"
 #include"Common.h"
 
 class Field {
@@ -13,6 +14,10 @@ public:
 	//デストラクタ！
 	~Field();
 
+	//当たった判定
+	bool CheckHit(Mino& mino_);
+
 	//フィールド描画
 	void Draw()const;
 };
+Field* field = nullptr;

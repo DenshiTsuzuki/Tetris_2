@@ -2,9 +2,13 @@
 #include"Common.h"
 #include"Mino.h"
 #include"Field.h"
+
 class Game : public Task_Scene::Scene
 {
-	Mino _mino;
+	//扱うミノ
+	shared_ptr<Mino> _mino;
+
+	//フィールド
 	Field _field;
 public:
 	//コンストラクタ

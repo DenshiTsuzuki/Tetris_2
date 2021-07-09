@@ -33,6 +33,31 @@ Field::~Field()
 {
 }
 
+bool Field::CheckHit(Mino& mino_)
+{
+	for (int y = 0;y < 4;++y) {
+		for (int x = 0;x < 4;++x) {
+			//判定しない
+			if (mino_._shape[y][x] == 0) { continue; }
+
+			int xx = mino_._pos.x + x;
+			int yy = mino_._pos.y + y;
+			//範囲外チェック
+			if (xx > 0 || xx >= field_size_x 
+				|| yy < 0 || yy >= field_size_y) {
+				return true;
+			}
+
+			//ブロック内のブロックと当たっている場合
+			if (this->_field[yy][xx] != 0) {
+				return true;
+			}
+
+		}
+	}
+	return false;
+}
+
 void Field::Draw() const
 {
 	//配列番号によって数値をわける

@@ -1,5 +1,7 @@
 #include"Mino.h"
 Mino::Mino(int x, int y, int r, Mino_Type type) :
+	_fallcnt(0),
+	_interval(def_interval - player._level * 2),
 	_pos(x, y),
 	_r(r),
 	_type(type),
@@ -12,6 +14,10 @@ Mino::Mino(int x, int y, int r, Mino_Type type) :
 {
 	this->CreateMino();
 };
+void Mino::Rotate()
+{
+	
+}
 void Mino::CreateMino()
 {
 	
@@ -75,8 +81,21 @@ void Mino::Draw() const
 	for (int y = 0;y < mino_wh;++y) {
 		for (int x = 0;x < mino_wh;++x) {
 			if (this->_shape[y][x] == 0) { continue; }
-			Rect(x * mino_s + field_x, y * mino_s + field_y, mino_s, mino_s).draw().drawFrame(0, 1, Palette::Black);
+			
+			Rect((this->_pos.x + x) * mino_s + field_x, 
+				(this->_pos.y + y) * mino_s + field_y, mino_s, mino_s).draw().drawFrame(0, 1, Palette::Black);
 		}
 	}
 
+}
+
+void Mino::Update()
+{
+	++_fallcnt;
+	//—Ž‰ºˆ—
+	if (this->_fallcnt >= this->_interval || KeyDown.pressed()) {
+		++this->_pos.y;
+		this->_fallcnt = 0;
+
+	}
 }

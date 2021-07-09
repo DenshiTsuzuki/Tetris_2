@@ -2,7 +2,19 @@
 #include"Common.h"
 class Mino
 {
+	//回転！
+	void Rotate();
+	
+	//形状定義
+	void CreateMino();
+
 public:
+	//タイマー
+	int _fallcnt;
+
+	//インターバル
+	int _interval;
+
 	//位置
 	Point _pos;
 
@@ -17,10 +29,10 @@ public:
 
 	Mino(int x, int y, int r, Mino_Type type);
 
-	//形状定義
-	void CreateMino();
-
 	//描画
 	void Draw()const;
+
+	//更新
+	void Update();
 };
 
