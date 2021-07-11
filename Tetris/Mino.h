@@ -1,23 +1,17 @@
 #pragma once
 #include"Common.h"
+
 class Mino
 {
-	//右回転！
-	void RotateR();
-	
-	//左回転！
-	void RotateL();
-	//形状定義
-	void CreateMino();
 
 public:
 	using SP = shared_ptr<Mino>;
 	using WP = weak_ptr<Mino>;
 	using UP = unique_ptr<Mino>;
-
-	//タイマー
+	//タイマー	//下移動,横移動,回転
 	int _fallcnt;
 	int _movecnt;
+	int _rotcnt;
 
 	//インターバル
 	int _interval;
@@ -26,20 +20,19 @@ public:
 	Point _pos;
 
 	//回転数
-	int _r;
+	int _rot;
 
 	//番号割り振り
 	Mino_Type _type;
-	
-	//形
-	int _shape[mino_wh][mino_wh];
 
 	Mino(int x, int y, Mino_Type type);
 
-	//描画
-	void Draw()const;
+	//オフセット対応Draw
+	void Draw(int x_, int y_)const;
+
+	//グリッド込み表示
+	void DrawWithGrid(int x_, int y_)const;
 
 	//更新
 	void Update();
 };
-

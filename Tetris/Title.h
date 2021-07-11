@@ -3,7 +3,8 @@
 class Title: public Task_Scene::Scene
 {
 private:
-	
+	Font _titlefont;
+	Font _font;
 
 public:
 	//コンストラクタ

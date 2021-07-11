@@ -2,11 +2,16 @@
 #include"Title.h"
 #include"Game.h"
 #include"End.h"
+
 void Main()
 {
 	const int32 scene_x = 1200;
-	const int32 scene_y = 960;
+	const int32 scene_y = 900;
 	Scene::Resize(scene_x, scene_y);
+	Window::Resize(scene_x, scene_y);
+
+	//テクスチャの登録
+	TextureAsset::Register(U"Block", U"image/Block.png", TextureDesc::Mipped);
 
 	//シーン遷移管理
 	Task_Scene task_scene;

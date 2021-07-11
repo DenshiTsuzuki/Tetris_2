@@ -7,179 +7,118 @@ Mino::Mino(int x, int y, Mino_Type type) :
 	_interval(def_interval),
 	_pos(x, y),
 	_type(type),
-	_movecnt(0),
-	_shape{
-		{0,0,0,0},
-		{0,0,0,0},
-		{0,0,0,0},
-		{0,0,0,0}
-	}
+	_rot(0),
+	_movecnt(10),
+	_rotcnt(10)
 {
-	this->CreateMino();
+
 };
-void Mino::RotateR()
+
+void Mino::Draw(int x_, int y_) const
 {
-	//右回転
-	for (int y = 0;y < 2;++y) {
-		for (int x = 0;x < 2;++x) {
-			//番号保存
-			int tmp = this->_shape[3 - x][y];
+	BlockData* _bd = &bdp[(int)this->_type][this->_rot];
+	for (int y = 0;y < 4;++y) {
+		for (int x = 0;x < 4;++x) {
+			if (_bd->_arr[y][x] == 0) { continue; }
 
-			//左下に右下を代入
-			this->_shape[3 - x][y] = this->_shape[3 - y][3 - x];
-
-			//右下に右上を代入
-			this->_shape[3 - y][3 - x] = this->_shape[x][3 - y];
-
-			//右上に左上を
-			this->_shape[x ][3 - y] = this->_shape[y][x];
-
-			this->_shape[y][x] = tmp;
+			TextureAsset(U"Block")((int)this->_type * 12, 0, 12, 12)
+				.resized(mino_s)
+				.draw((this->_pos.x + x) * mino_s + x_, (this->_pos.y + y) * mino_s + y_);
 		}
 	}
 }
 
-void Mino::RotateL()
+void Mino::DrawWithGrid(int x_, int y_) const
 {
-	//左回転
-	for (int y = 0;y < 2;++y) {
-		for (int x = 0;x < 2;++x) {
-			//左上保存
-			int tmp = this->_shape[y][x];
+	BlockData* _bd = &bdp[(int)this->_type][this->_rot];
+	for (int y = 0;y < 4;++y) {
+		for (int x = 0;x < 4;++x) {
+			//フィールドのグリッド線描画
+			Rect((this->_pos.x + x) * mino_s + x_,
+				(this->_pos.y + y) * mino_s + y_, mino_s, mino_s).drawFrame(0, 1, Palette::Whitesmoke);
 
-			//右上を左上へ
-			this->_shape[y][x] = this->_shape[x][3 - y];
+			if (_bd->_arr[y][x] == 0) { continue; }
 
-			//右下を右上へ
-			this->_shape[x][3 - y] = this->_shape[3 - y][3 - x];
-
-			//左下を右下へ
-			this->_shape[3 - y][3 - x] = this->_shape[3 - x][y];
-
-			//保存していたものを左下へ
-			this->_shape[3 - x][y] = tmp;
+			TextureAsset(U"Block")((int)this->_type * 12, 0, 12, 12)
+				.resized(mino_s)
+				.draw((this->_pos.x + x) * mino_s + x_, (this->_pos.y + y) * mino_s + y_);
 		}
 	}
-}
-
-void Mino::CreateMino()
-{
-	
-	//形状を決める
-	switch (this->_type) {
-		using enum Mino_Type;
-	case I:
-		_shape[0][1] = int(I);
-		_shape[1][1] = int(I);
-		_shape[2][1] = int(I);
-		_shape[3][1] = int(I);
-		break;
-
-	case T:
-		_shape[0][1] = int(T);
-		_shape[1][0] = int(T);
-		_shape[1][1] = int(T);
-		_shape[1][2] = int(T);
-		break;
-
-	case O:
-		_shape[1][1] = int(O);
-		_shape[1][2] = int(O);
-		_shape[2][1] = int(O);
-		_shape[2][2] = int(O);
-	break;
-
-	case J:
-		_shape[0][1] = int(J);
-		_shape[1][1] = int(J);
-		_shape[2][0] = int(J);
-		_shape[2][1] = int(J);
-		break;
-
-	case L:
-		_shape[0][0] = int(L);
-		_shape[1][0] = int(L);
-		_shape[2][0] = int(L);
-		_shape[2][1] = int(L);
-		break;
-
-	case S:
-		_shape[0][1] = int(S);
-		_shape[0][2] = int(S);
-		_shape[1][1] = int(S);
-		_shape[1][0] = int(S);
-		break;
-
-	case Z:
-		_shape[0][0] = int(Z);
-		_shape[0][1] = int(Z);
-		_shape[1][1] = int(Z);
-		_shape[1][2] = int(Z);
-		break;
-	}
-
-}
-
-void Mino::Draw() const
-{
-	for (int y = 0;y < mino_wh;++y) {
-		for (int x = 0;x < mino_wh;++x) {
-			if (this->_shape[y][x] == 0) { continue; }
-			
-			Rect((this->_pos.x + x) * mino_s + field_x, 
-				(this->_pos.y + y) * mino_s + field_y, mino_s, mino_s).draw().drawFrame(0, 1, Palette::Black);
-		}
-	}
-
 }
 
 void Mino::Update()
 {
 	++_fallcnt;
 	++_movecnt;
-	auto& field = GameSystem::GetInstance()->_field;
+	++_rotcnt;
+
+	//譲歩取得用
+	GameSystem* gm = GameSystem::GetInstance();
+	
+	//フィールド情報取得
+	auto& field = gm->_field;
+	
 	//落下処理
 	if (this->_fallcnt >= this->_interval || KeyDown.pressed()) {
 		++this->_pos.y;
 		this->_fallcnt = 0;
-		//当たっている判定
-		if (field->CheckHit(this)) {
-			//下に行かない
-			--this->_pos.y;
+		//当たり判定
+		if (field->CheckHit(&this->_pos, &bdp[(int)this->_type][this->_rot])) {
+		//下に行かない
+		--this->_pos.y;
 
-			//フィールドに書き込み
-			field->InputMino(this);
+		//フィールドに書き込み
+		field->InputMino(&this->_pos,&bdp[(int)this->_type][this->_rot]);
 
-			//削除
-			GameSystem::GetInstance()->_mino.release();
+		//盤面消去判定を行う
+		int i = field->Erase();
+
+		//得点加算
+		gm->_score += scoredef[i];
+
+		//削除
+		gm->_mino.release();
+
+		
 		}
 	}
-	//横への移動
-	Point pre = this->_pos;
-	if (KeyLeft.pressed() && _movecnt > 15) { --this->_pos.x; _movecnt = 0; }
-	if (KeyRight.pressed() && _movecnt > 15) { ++this->_pos.x; _movecnt = 0; }
-	if (field->CheckHit(this)) {
-		this->_pos = pre;
+
+
+	//-----------------------横への移動------------------------------------------------
+	int preX = this->_pos.x;
+
+	//左移動！
+	if (KeyLeft.pressed() && _movecnt > 10) { 
+		--this->_pos.x; 
+		_movecnt = 0;
+	}
+	//右移動！
+	if (KeyRight.pressed() && _movecnt > 10) { 
+		++this->_pos.x; 
+		_movecnt = 0; 
+	}
+	if (field->CheckHit(&this->_pos, &bdp[(int)this->_type][this->_rot])) {
+		this->_pos.x = preX;
 	}
 
-	//回転処理
-	//開店前を保存
-	int pre2[4][4];
-	memcpy(pre2,this->_shape, sizeof(this->_shape));
-	
-	//右回転
-	if (KeyZ.down()) {
-		this->RotateR();
+
+	//----------------------回転処理---------------------------------------------------
+	int prerot = this->_rot;
+	//右回転！
+	if (KeyZ.pressed() && _rotcnt > 10) {
+		this->_rot = (this->_rot + 1 + 50000) % 4;
+		_rotcnt = 0;
+	}
+	//左回転！
+	if (KeyX.pressed() && _rotcnt > 10) { 
+		this->_rot = (this->_rot - 1 + 50000) % 4;
+		_rotcnt = 0;
+	}
+	//接触判定
+	if (field->CheckHit(&this->_pos, &bdp[(int)this->_type][this->_rot])) {
+		this->_rot = prerot;
 	}
 
-	//左回転
-	if (KeyX.down()) {
-		this->RotateL();
-	}
 
-	//戻す
-	if (field->CheckHit(this)) {
-		memcpy(this->_shape, pre2, sizeof(this->_shape));
-	}
 }
 
