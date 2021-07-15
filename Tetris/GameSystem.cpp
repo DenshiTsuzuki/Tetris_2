@@ -4,6 +4,7 @@ GameSystem* GameSystem::gs1 = nullptr;
 GameSystem::GameSystem() :
 	_mino(make_unique<Mino>(4, 0, Mino_Type::O)),
 	_nextmino(make_unique<Mino>(4,0, Mino_Type::T)),
+	_holdmino(make_unique<Mino>(4,0,Mino_Type::non)),
 	_field(make_unique<Field>()),
 	_isGameOver(false),
 	_fadecnt(9),
@@ -43,16 +44,14 @@ void GameSystem::Update() {
 		this->_mino->Update();
 	}
 
-	//操作するミノを変更
-	if (this->_mino == nullptr && this->_nextmino != nullptr) {
-		//変更時fallintervalを変更する
-		this->_nextmino->_interval -= this->_level - 1;
-		this->_mino.swap(_nextmino);
-
-		//ミノ生成時接触判定があればゲームオーバー
-		this->_isGameOver = this->_field->CheckHit(&_mino->_pos, &bdp[(int)_mino->_type][_mino->_rot]);
+	//ホールドミノとの変更
+	if (KeyC.down()) {
+		this->MinoHold();
 	}
-	
+
+	//操作するミノを変更
+	this->ChangeMino();
+
 	//ネクストミノ生成
 	if (this->_nextmino == nullptr) {
 		int i = Random(1, 7);
@@ -69,17 +68,54 @@ void GameSystem::Draw() const
 	
 	this->_field->Draw();
 	
+	//盤面上のミノ
 	if (this->_mino != nullptr) {
 		this->_mino->Draw(field_x,field_y);
 	}
 
+	//ネクストミノ
 	if (this->_nextmino != nullptr) {
 		this->_nextmino->DrawWithGrid(next_x,next_y);
 	}
+
+	//ホールドミノ
+	if (this->_holdmino != nullptr) {
+		this->_holdmino->DrawWithGrid(next_x + 200, next_y);
+	}
+
 	this->_font(U"SCORE : {}"_fmt(this->_score)).draw(score_x,score_y);
 	this->_font(U"LEVEL : {}"_fmt(this->_level)).draw(score_x, score_y + 50);
 	this->_minifont(U"Next Mino ").draw(next_x + 100, next_y - 50);
+	this->_minifont(U"Hold").draw(next_x + 350, next_y - 50);
 	this->_font(U"HIGHSCIRE : {}"_fmt(this->_nowhighscore)).draw(score_x, score_y + 100);
+}
+
+void GameSystem::ChangeMino()
+{
+	//操作するミノを変更
+	if (this->_mino == nullptr && this->_nextmino != nullptr) {
+		//変更時fallintervalを変更する
+		this->_nextmino->_interval -= this->_level - 1;
+		this->_mino.swap(_nextmino);
+
+		//ミノ生成時接触判定があればゲームオーバー
+		this->_isGameOver = this->_field->CheckHit(&_mino->_pos, &bdp[(int)_mino->_type][_mino->_rot]);
+	}
+}
+
+void GameSystem::MinoHold()
+{
+
+	//ホールドと変更
+	if (this->_mino != nullptr) {
+		this->_mino.swap(this->_holdmino);
+		//削除
+		if (this->_mino->_type == Mino_Type::non) {
+			this->_mino.release();
+		}
+	}
+	//ポジション初期化
+	this->_holdmino->_pos = Point(4, 0);
 }
 
 GameSystem* GameSystem::GetInstance()

@@ -16,6 +16,9 @@ public:
 	//次
 	Mino::UP _nextmino;
 
+	//ホールド
+	Mino::UP _holdmino;
+
 	//フィールド
 	Field::UP _field;
 
@@ -37,6 +40,12 @@ public:
 	void Update();
 
 	void Draw()const;
+
+	//ミノ変更　ネクストより
+	void ChangeMino();
+
+	//ホールドミノ変更
+	void MinoHold();
 
 	//シングルトン
 	static GameSystem* gs1;

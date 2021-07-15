@@ -13,7 +13,8 @@ enum class State {
 using Task_Scene = SceneManager < State>;
 
 enum class Mino_Type :int{
-	I = 1,
+	non,
+	I ,
 	O ,
 	T ,
 	J ,
@@ -272,7 +273,7 @@ static int scoredef[5] = { 0,100,300,600,1000 };
 
 //ネクストブロック表示位置
 #define next_x 450
-#define next_y 80
+#define next_y 350
 
 //4*4
 #define mino_wh 4
@@ -281,5 +282,5 @@ static int scoredef[5] = { 0,100,300,600,1000 };
 #define def_interval 30
 
 //スコア表示用
-#define score_x 800
+#define score_x 550
 #define score_y 60
