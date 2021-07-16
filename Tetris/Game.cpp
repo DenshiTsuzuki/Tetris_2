@@ -4,7 +4,11 @@ Game::Game(const InitData& init_) :
 	IScene(init_)
 {
 	GameSystem::Create();
-};
+}
+void Game::Fade()
+{
+}
+;
 
 //タイトル内更新
 void Game::update(){
@@ -18,6 +22,7 @@ void Game::update(){
 		}
 		changeScene(State::End);
 	}
+
 	gs->Update();
 }
 

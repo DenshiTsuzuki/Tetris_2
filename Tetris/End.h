@@ -14,6 +14,7 @@ private:
 public:
 	//コンストラクタ
 	End(const InitData& init_);
+	~End();
 	//更新
 	void update()override;
 	//描画　const修飾

@@ -106,11 +106,17 @@ void Mino::Update()
 	int prerot = this->_rot;
 	//‰E‰ñ“]I
 	if (KeyZ.pressed() && _rotcnt > 10) {
+		//‰¹
+		AudioAsset(U"Rot").playOneShot();
+
 		this->_rot = (this->_rot + 1 + 50000) % 4;
 		_rotcnt = 0;
 	}
 	//¶‰ñ“]I
 	if (KeyX.pressed() && _rotcnt > 10) { 
+		//‰¹
+		AudioAsset(U"Rot").playOneShot();
+
 		this->_rot = (this->_rot - 1 + 50000) % 4;
 		_rotcnt = 0;
 	}

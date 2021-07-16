@@ -60,6 +60,9 @@ bool Field::CheckHit(Point* p_, BlockData* b_)
 
 void Field::InputMino(Point* p_, BlockData* b_)
 {
+	//‰¹
+	AudioAsset(U"MinoInput").playOneShot();
+
 	for (int y = 0;y < 4;++y) {
 		for (int x = 0;x < 4;++x) {
 			//0 ‚Í”»’è‚µ‚È‚¢

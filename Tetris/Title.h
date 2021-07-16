@@ -9,6 +9,9 @@ private:
 public:
 	//コンストラクタ
 	Title(const InitData& init_);
+	//デストラクタ！
+	~Title();
+
 	//更新
 	void update()override;
 	//描画　const修飾

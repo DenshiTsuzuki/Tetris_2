@@ -1,6 +1,8 @@
 #pragma once
 #include"Common.h"
 
+class Field;
+
 class Mino
 {
 

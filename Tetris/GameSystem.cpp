@@ -25,11 +25,22 @@ GameSystem::GameSystem() :
 		reader.readLine(line);
 		this->_nowhighscore = Parse<int>(line);
 	}
+
+	//BGMî≠ê∂
+	AudioAsset(U"GameBGM").setLoop(true);
+	AudioAsset(U"GameBGM").setVolume(0.3);
+	AudioAsset(U"GameBGM").play();
 }
 GameSystem::~GameSystem() {
+	//É|ÉCÉìÉ^èâä˙âª
 	_mino.reset();
 	_nextmino.reset();
 	_field.reset();
+
+	//âπé~ÇﬂÇÈ
+	if (AudioAsset(U"GameBGM").isPlaying()) {
+		AudioAsset(U"GameBGM").pause();
+	}
 }
 
 void GameSystem::Update() {
