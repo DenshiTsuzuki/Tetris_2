@@ -2,6 +2,7 @@
 #include"Common.h"
 
 class Field;
+class Game;
 
 class Mino
 {
@@ -15,7 +16,7 @@ public:
 	int _movecnt;
 	int _rotcnt;
 
-	//インターバル
+	//落下インターバル
 	int _interval;
 
 	//位置
@@ -35,6 +36,17 @@ public:
 	//グリッド込み表示
 	void DrawWithGrid(int x_, int y_)const;
 
-	//更新
-	void Update();
+	//更新処理
+	void Update(Game* game_,Field& field_);
+
+private:
+	//落ちる処理
+	void Fall(Game* game_,Field& field_);
+
+	//横移動処理
+	void MoveLR(Field& field_);
+
+	//回転処理
+	void Rotation(Field& field_);
+
 };

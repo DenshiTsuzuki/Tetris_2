@@ -1,7 +1,7 @@
 #pragma once
 #include"Mino.h"
-#include"GameSystem.h"
-
+#include"Field.h"
+#include"Game.h"
 Mino::Mino(int x, int y, Mino_Type type) :
 	_fallcnt(0),
 	_interval(def_interval),
@@ -46,63 +46,71 @@ void Mino::DrawWithGrid(int x_, int y_) const
 	}
 }
 
-void Mino::Update()
+void Mino::Update(Game* game_,Field& field_)
 {
 	++_fallcnt;
 	++_movecnt;
 	++_rotcnt;
 
-	//譲歩取得用
-	GameSystem* gm = GameSystem::GetInstance();
-	
-	//フィールド情報取得
-	auto& field = gm->_field;
-	
+	//落下処理
+	this->Fall(game_,field_);
+
+	//横移動
+	this->MoveLR(field_);
+
+	//回転
+	this->Rotation(field_);
+}
+
+void Mino::Fall(Game* game_,Field& field_)
+{
 	//落下処理
 	if (this->_fallcnt >= this->_interval || KeyDown.pressed()) {
 		++this->_pos.y;
 		this->_fallcnt = 0;
 		//当たり判定
-		if (field->CheckHit(&this->_pos, &bdp[(int)this->_type][this->_rot])) {
-		//下に行かない
-		--this->_pos.y;
+		if (field_.CheckHit(&this->_pos, &bdp[(int)this->_type][this->_rot])) {
+			//下に行かない
+			--this->_pos.y;
 
-		//フィールドに書き込み
-		field->InputMino(&this->_pos,&bdp[(int)this->_type][this->_rot]);
+			//フィールドに書き込み
+			field_.InputMino(&this->_pos, &bdp[(int)this->_type][this->_rot]);
 
-		//盤面消去判定を行う
-		int i = field->Erase();
+			//盤面消去判定を行う
+			int i = field_.Erase();
 
-		//得点加算
-		gm->_score += scoredef[i];
+			//得点加算
+			game_->ScorePuls(i);
 
-		//削除
-		gm->_mino.release();
+			//自身削除
+			this->_type = Mino_Type::non;
 
-		
 		}
 	}
+}
 
-
-	//-----------------------横への移動------------------------------------------------
+void Mino::MoveLR(Field& field_)
+{
 	int preX = this->_pos.x;
 
 	//左移動！
-	if (KeyLeft.pressed() && _movecnt > 10) { 
-		--this->_pos.x; 
+	if (KeyLeft.pressed() && _movecnt > 10) {
+		--this->_pos.x;
 		_movecnt = 0;
 	}
 	//右移動！
-	if (KeyRight.pressed() && _movecnt > 10) { 
-		++this->_pos.x; 
-		_movecnt = 0; 
+	if (KeyRight.pressed() && _movecnt > 10) {
+		++this->_pos.x;
+		_movecnt = 0;
 	}
-	if (field->CheckHit(&this->_pos, &bdp[(int)this->_type][this->_rot])) {
+	if (field_.CheckHit(&this->_pos, &bdp[(int)this->_type][this->_rot])) {
 		this->_pos.x = preX;
 	}
 
+}
 
-	//----------------------回転処理---------------------------------------------------
+void Mino::Rotation(Field& field_)
+{
 	int prerot = this->_rot;
 	//右回転！
 	if (KeyZ.pressed() && _rotcnt > 10) {
@@ -113,7 +121,7 @@ void Mino::Update()
 		_rotcnt = 0;
 	}
 	//左回転！
-	if (KeyX.pressed() && _rotcnt > 10) { 
+	if (KeyX.pressed() && _rotcnt > 10) {
 		//音
 		AudioAsset(U"Rot").playOneShot();
 
@@ -121,10 +129,9 @@ void Mino::Update()
 		_rotcnt = 0;
 	}
 	//接触判定
-	if (field->CheckHit(&this->_pos, &bdp[(int)this->_type][this->_rot])) {
+	if (field_.CheckHit(&this->_pos, &bdp[(int)this->_type][this->_rot])) {
 		this->_rot = prerot;
 	}
-
 
 }
 

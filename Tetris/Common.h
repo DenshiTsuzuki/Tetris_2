@@ -2,16 +2,17 @@
 #include<Siv3D.hpp>
 using namespace std;
 
+//シーン管理用
 enum class State {
 	Title,
 	Game,
 	End
 };
 
-
-
+//シーン
 using Task_Scene = SceneManager < State>;
 
+//ミノ形状
 enum class Mino_Type :int{
 	non,
 	I ,
@@ -255,9 +256,6 @@ static BlockData bdp[8][4] = {
 
 }
 };
-
-//スコア加算
-static int scoredef[5] = { 0,100,300,600,1000 };
 
 //フィールド配列
 #define field_size_x 12
